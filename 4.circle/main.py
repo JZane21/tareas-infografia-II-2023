@@ -1,5 +1,5 @@
 import arcade
-from circle import get_circle
+from circle2 import get_circle
 
 # definicion de constantes
 SCREEN_WIDTH = 800
@@ -13,16 +13,23 @@ class BresenhamWindow(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         arcade.set_background_color(arcade.color.BLACK)
         self.pixel_size = 25
+        self.xc = 50
+        self.yc = 50
+        self.r = 20
+        self.circle_color = arcade.color.RED_ORANGE
+        self.speed = 0
+        
+    def on_update(self, delta_time: float):
+        self.xc += delta_time * self.speed
+        if self.xc > SCREEN_WIDTH // self.pixel_size:
+            self.xc = 0
 
     def on_draw(self):
         arcade.start_render()
-        xc = 15
-        yc = 15
-        r = 15
-        points = get_circle(xc, yc, r)
+        points = get_circle(self.xc, self.yc, self.r)
         self.draw_grid()
-        self.draw_circle_points(points, arcade.color.DARK_YELLOW)
-        self.draw_scaled_circle(xc, yc, r)
+        self.draw_circle_points(points, arcade.color.RED)
+        self.draw_scaled_circle(self.xc, self.yc, self.r)
 
     def draw_grid(self):
         # lineas verticales
