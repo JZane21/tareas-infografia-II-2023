@@ -1,8 +1,8 @@
 def algoritmo_dda(x_0,y_0,x_1,y_1):
   x_r = x_1 - x_0
-  x_r_mod = abs(x_r)
+  x_r_mod = x_r if x_r >= 0 else (-1) * x_r
   y_r = y_1 - y_0
-  y_r_mod = abs(y_r)
+  y_r_mod = y_r if y_r >= 0 else (-1) * y_r
   
   longitud = 0
   
@@ -22,8 +22,7 @@ def algoritmo_dda(x_0,y_0,x_1,y_1):
   points_list = [(x_0, y_0)]
   
   while k <= longitud:
-    point = (x,y)
-    points_list.append(point)
+    points_list.append((x,y))
     x += x_d
     y += y_d
     k += 1

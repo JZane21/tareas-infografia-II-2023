@@ -16,15 +16,21 @@ class BresenhamWindow(arcade.Window):
         self.yc = 50
         self.r = 20
         self.circle_color = arcade.color.RED_DEVIL
-
-        self.speed = 10
+        self.rebote_x = False
+        self.speed = 30
 
     def on_update(self, delta_time: float):
-        self.xc += delta_time * self.speed
-        
-        print(self.xc)
-        if self.xc > SCREEN_WIDTH // self.pixel_size:
-            self.xc = 0
+        velocity = delta_time * self.speed
+        if self.xc-self.r <=0 and self.rebote_x:
+            self.rebote_x = False
+            self.xc += velocity
+        if (self.xc+self.r < (SCREEN_WIDTH  // self.pixel_size) and not self.rebote_x):
+            self.xc += velocity
+        elif (self.xc+self.r) >= (SCREEN_WIDTH  // self.pixel_size):
+            self.rebote_x = True
+            self.xc -= velocity
+        elif (self.xc+self.r < (SCREEN_WIDTH  // self.pixel_size) and self.rebote_x):
+            self.xc -= velocity
 
     def on_draw(self):
         arcade.start_render()

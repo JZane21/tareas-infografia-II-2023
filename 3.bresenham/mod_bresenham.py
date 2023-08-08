@@ -1,4 +1,3 @@
-
 def get_line(x0, y0, x1, y1):
   d_x = x1 - x0
   d_x *= (1 if d_x>=0 else -1)
@@ -27,4 +26,4 @@ def get_line(x0, y0, x1, y1):
   return points
 
 if __name__ == "__main__":
-    print(get_line(2, 2, 10, 5))
+  print(get_line(5,7,10,3))

@@ -1,5 +1,5 @@
 import arcade
-from bresenham import get_line
+from mod_bresenham import get_line
 from alg_dda import algoritmo_dda
 
 # definicion de constantes
@@ -16,10 +16,10 @@ class BresenhamWindow(arcade.Window):
 
     def on_draw(self):
         arcade.start_render()
-        points = algoritmo_dda(5,7,30,3)
+        points = get_line(5,7,10,3)
         self.draw_grid()
         self.draw_line_points(points, arcade.color.DARK_YELLOW)
-        self.draw_scaled_line(5,7,30,3)
+        self.draw_scaled_line(5,7,10,3)
 
     def draw_grid(self):
         # lineas verticales
