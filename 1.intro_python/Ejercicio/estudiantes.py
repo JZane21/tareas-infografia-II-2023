@@ -179,7 +179,7 @@ class Evaluador:
                         quotechar=',', quoting=csv.QUOTE_MINIMAL)
             datos = ["Nombre Completo","Asistencia","MAT","FIS",
                 "QMC","LAB","Total Extras","Promedio Final","Observacion"]
-            informacion_estudiantes = [[] for i in range (len(estudiantes))]
+            informacion_estudiantes = [[] for _ in range (len(estudiantes))]
             spamwriter.writerow(datos)
             index = 0
             for i in estudiantes:
