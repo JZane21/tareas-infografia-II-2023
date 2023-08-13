@@ -25,6 +25,8 @@ class App(arcade.Window):
         self.speed = 10
         self.tank = Tank(600, 600, SCREEN_WIDTH, SCREEN_HEIGHT,get_random_color())
         self.tank2 = Tank(200, 200, SCREEN_WIDTH, SCREEN_HEIGHT,get_random_color())
+        self.tank.tank = self.tank2
+        self.tank2.tank = self.tank
         self.enemies = [
             Enemy(
                 random.randrange(0, SCREEN_WIDTH),
@@ -32,6 +34,49 @@ class App(arcade.Window):
                 random.randrange(15, 60)
             )
             for _ in range(7)
+        ]
+        
+        self.limitGame = Polygon2D(
+            [
+                (2,698),
+                (798,698),
+                (798,2),
+                (2,2)
+            ],
+            arcade.color.REDWOOD
+        )
+        self.lifeZoneOne = Polygon2D(
+            [
+                (2,790),
+                (300,790),
+                (300,750),
+                (2,750),
+            ],
+            arcade.color.GREEN
+        )
+        self.lifePositionsOne = [
+            (50,770),
+            (100,770),
+            (150,770),
+            (200,770),
+            (250,770),
+        ]
+        
+        self.lifeZoneTwo = Polygon2D(
+            [
+                (798,790),
+                (490,790),
+                (490,750),
+                (798,750),
+            ],
+            arcade.color.GREEN
+        )
+        self.lifePositionsTwo = [
+            (750,770),
+            (700,770),
+            (650,770),
+            (600,770),
+            (550,770),
         ]
         
     '''
@@ -99,46 +144,49 @@ class App(arcade.Window):
         for e in self.enemies:
             e.detect_collision(self.tank)
             e.detect_collision(self.tank2)
+        self.tank.detect_attack(self.tank2)
+        self.tank2.detect_attack(self.tank)
         
     def on_draw(self):
         arcade.start_render()
-        limitGame = Polygon2D(
-            [
-                (2,698),
-                (798,698),
-                (798,2),
-                (2,2)
-            ],
-            arcade.color.REDWOOD
-        )
-        lifeZoneOne = Polygon2D(
-            [
-                (2,790),
-                (300,790),
-                (300,710),
-                (2,710),
-            ],
-            arcade.color.GREEN
-        )
-        lifeZoneTwo = Polygon2D(
-            [
-                (798,790),
-                (490,790),
-                (490,710),
-                (798,710),
-            ],
-            arcade.color.GREEN
-        )
-        lifeZoneOne.draw()
-        lifeZoneTwo.draw()
-        limitGame.draw()
         
-        self.tank.draw()
+        self.lifeZoneOne.draw()
+        index_one = 1
+        if len(self.lifePositionsOne) > 0:
+            for i in self.lifePositionsOne:
+                if index_one <= self.tank.lifes:
+                    arcade.draw_circle_filled(i[0],i[1],15,arcade.color.GREEN)
+                else:
+                    break
+                index_one += 1
+                
+        self.lifeZoneTwo.draw()
+        index_two = 1
+        if len(self.lifePositionsTwo) > 0:
+            for i in self.lifePositionsTwo:
+                if index_two <= self.tank2.lifes:
+                    arcade.draw_circle_filled(i[0],i[1],15,arcade.color.GREEN)
+                else:
+                    break
+                index_two += 1
+        
+        self.limitGame.draw()
+        
         self.tank2.draw()
+        self.tank.draw()
+        
+        self.tank.tank = self.tank2
+        self.tank2.tank = self.tank
         
         for e in self.enemies:
             e.draw()
-    
+
+        if self.tank.lifes <=0 or self.tank2.lifes <=0:
+            arcade.draw_rectangle_filled(0,0,SCREEN_WIDTH*2,SCREEN_HEIGHT*2,arcade.color.BLACK)
+            arcade.draw_text(f"¡Gano el jugador {(1 if self.tank2.lifes <=0 else 2)}!",
+                            SCREEN_WIDTH//2, SCREEN_HEIGHT//2,
+                            arcade.color.ROSE, font_size=30, anchor_x="center")
+            self.set_exclusive_keyboard(True)
     
 if __name__ == "__main__":
     app = App()

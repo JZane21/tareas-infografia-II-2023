@@ -3,6 +3,13 @@ import arcade
 import math
 import random
 
+def get_random_color():
+    return (
+        random.randint(0, 255),
+        random.randint(0, 255),
+        random.randint(0, 255),
+    )
+
 class Polygon2D:
     def __init__(self, vertices, color, rot_speed=0):
         self.vertices = vertices
@@ -80,15 +87,19 @@ class Polygon2D:
 
 
 class Tank:
-    def __init__(self, x, y, SCREEN_WIDTH, SCREEN_HEIGHT,color) -> None:
+    def __init__(self, x, y, SCREEN_WIDTH, SCREEN_HEIGHT,color,tank=None) -> None:
         self.color = color
         self.x = x
         self.y = y
+        self.original_x = x
+        self.original_y = y
         self.speed = 0
         self.angular_speed = 0
         self.theta = 0
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
+        self.tank = tank
+        self.lifes = 5
         
         self.body_distance = 30
         self.body = Polygon2D([
@@ -121,6 +132,11 @@ class Tank:
             (90+x+i,20+y-j)
             for i in range(0,20,1) for j in range(0,40,1)
         ],color)
+        
+        self.shield = Polygon2D(
+            self.get_circle(x, y, 35),
+            get_random_color()
+        )
         
         self.left_track = Polygon2D(
             [
@@ -167,7 +183,6 @@ class Tank:
         #     [(30+x,60+y),self.wheel_radious,color],
         #     [(50+x,60+y),self.wheel_radious,color]
         # ]
-        self.life = 100
         arcade.draw_circle_outline
         self.bullets = []
         
@@ -182,6 +197,19 @@ class Tank:
             (x0-y1,y0+x1),
             (x0-y1,y0-x1)
         ]
+        
+    def detect_attack(self, tank):
+        index = 0
+        for bullet in tank.bullets:
+            if self.distance_to(bullet) <= self.body_distance + 5:
+                tank.bullets[index:index+1]=[]
+                self.lifes -= 1
+                break
+            index += 1
+            
+    def distance_to(self, bullet):
+        xb, yb, tb, sb = bullet
+        return math.sqrt((xb - self.x)**2 + (yb - self.y)**2)
 
     def get_circle(self,xc, yc, r):
         x = 0
@@ -203,10 +231,6 @@ class Tank:
     def shoot(self, bullet_speed):
         self.bullets.append((self.x, self.y, self.theta, bullet_speed))
 
-    def distance_to(self, bullet):
-        xb, yb, tb, sb = bullet
-        return math.sqrt((xb - self.x)**2 + (yb - self.y)**2)
-
     def update(self, delta_time: float):
         dtheta = self.angular_speed * delta_time
         dx = self.speed * math.cos(self.theta)
@@ -215,12 +239,19 @@ class Tank:
         self.x += dx
         self.y += dy
         
-        self.body.translate(dx, dy)
-        self.left_track.translate(dx, dy)
-        self.right_track.translate(dx, dy)
-        self.cannon.translate(dx,dy)
-        for i in self.wheels:
-            i.translate(dx,dy)
+        if (self.x > 0 and self.x < self.SCREEN_WIDTH) and (self.y > 0 and self.y < self.SCREEN_HEIGHT-150):
+            self.body.translate(dx, dy)
+            self.left_track.translate(dx, dy)
+            self.right_track.translate(dx, dy)
+            self.cannon.translate(dx,dy)
+            self.shield.translate(dx,dy)
+            for i in self.wheels:
+                i.translate(dx,dy)
+            self.original_x = self.x
+            self.original_y = self.y
+        else:
+            self.x = self.original_x
+            self.y = self.original_y
         
         self.body.rotate(dtheta, pivot=(self.x, self.y))
         self.left_track.rotate(dtheta, pivot=(self.x, self.y))
@@ -238,13 +269,17 @@ class Tank:
             self.bullets[i] = (new_x, new_y, theta, speed)
 
     def draw(self):
-        self.body.draw()
-        self.left_track.draw()
-        self.right_track.draw()
-        for i in self.wheels:
-            i.draw()
-        self.cannon.draw()
-        arcade.draw_point(self.x, self.y, arcade.color.RED, 4)
+        if self.lifes>0:
+            self.body.draw()
+            self.left_track.draw()
+            self.right_track.draw()
+            for i in self.wheels:
+                i.draw()
+            self.cannon.draw()
+            self.shield.draw()
+            
+            if (self.x > 0 and self.x < self.SCREEN_WIDTH) and (self.y > 0 and self.y < self.SCREEN_HEIGHT-150):
+                arcade.draw_point(self.x, self.y, arcade.color.RED, 4)
         for bx, by, theta, speed in self.bullets:
             arcade.draw_point(bx, by, self.color, 7)
 
