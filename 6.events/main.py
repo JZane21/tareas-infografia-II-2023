@@ -22,7 +22,13 @@ class App(arcade.Window):
         arcade.set_background_color(arcade.color.BLACK)
         self.objects = []
     
-    def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
+    '''
+    x:int,
+    y:int,
+    button:int,
+    modifiers:int
+    '''
+    def on_mouse_release(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             self.objects.append(Polygon2D(
                 vertices=[
@@ -34,7 +40,11 @@ class App(arcade.Window):
                 rot_speed=random.uniform(-2.5, 2.5)
             ))
 
-    def on_key_release(self, symbol: int, modifiers: int):
+    '''
+    symbol:int
+    modifiers:int
+    '''
+    def on_key_release(self, symbol, modifiers):
         if symbol == arcade.key.UP:
             for obj in self.objects:
                 obj.scale(1.1, 1.1)
