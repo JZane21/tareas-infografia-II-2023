@@ -87,7 +87,7 @@ class Polygon2D:
 
 
 class Tank:
-    def __init__(self, x, y, SCREEN_WIDTH, SCREEN_HEIGHT,color,tank=None) -> None:
+    def __init__(self, x, y, SCREEN_WIDTH, SCREEN_HEIGHT,color) -> None:
         self.color = color
         self.x = x
         self.y = y
@@ -98,8 +98,8 @@ class Tank:
         self.theta = 0
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
-        self.tank = tank
         self.lifes = 5
+        self.big_bullet = []
         
         self.body_distance = 30
         self.body = Polygon2D([
@@ -110,7 +110,7 @@ class Tank:
             (-self.body_distance + x, self.body_distance + y)
         ] + [
             (-self.body_distance + x + i, self.body_distance + y - j)
-            for i in range(0,60,1) for j in range(0,60,1)
+            for i in range(0,60,59) for j in range(0,60,1)
         ], color)
         self.cannon = Polygon2D([
             (30+x,10+y),
@@ -120,7 +120,7 @@ class Tank:
             (90+x,-10+y),
         ] + [
             (30+ x + i,10 + y - j)
-            for i in range(0,60,1) for j in range(0,20,1)
+            for i in range(0,60,6) for j in range(0,20,1)
         ] + [
             (90+x,-10+y),
             (90+x,-20+y),
@@ -130,7 +130,7 @@ class Tank:
             (90+x,10+y)
         ] + [
             (90+x+i,20+y-j)
-            for i in range(0,20,1) for j in range(0,40,1)
+            for i in range(0,20,2) for j in range(0,40,1)
         ],color)
         
         self.shield = Polygon2D(
@@ -176,14 +176,6 @@ class Tank:
                 color
             ) for i in self.wheels_positions
         ]
-        # [
-        #     [(-30+x,60+y),self.wheel_radious,color],
-        #     [(-10+x,60+y),self.wheel_radious,color],
-        #     [(10+x,60+y),self.wheel_radious,color],
-        #     [(30+x,60+y),self.wheel_radious,color],
-        #     [(50+x,60+y),self.wheel_radious,color]
-        # ]
-        arcade.draw_circle_outline
         self.bullets = []
         
     def get_symetry_points(self,x0,y0,x1,y1):
@@ -201,12 +193,22 @@ class Tank:
     def detect_attack(self, tank):
         index = 0
         for bullet in tank.bullets:
-            if self.distance_to(bullet) <= self.body_distance + 5:
+            if self.distance_to(bullet) <= self.body_distance + 1:
                 tank.bullets[index:index+1]=[]
                 self.lifes -= 1
                 break
             index += 1
-            
+
+        index = 0
+        for bigger in tank.big_bullet:
+            if self.distance_to(bigger) <= self.body_distance + 1:
+                tank.big_bullet[index:index+1]=[]
+                self.lifes -= 3
+                tank.big_bullet.append((0, 0, 0, 0))
+                tank.big_bullet.append((0, 0, 0, 0))
+                break
+            index += 1
+
     def distance_to(self, bullet):
         xb, yb, tb, sb = bullet
         return math.sqrt((xb - self.x)**2 + (yb - self.y)**2)
@@ -225,11 +227,13 @@ class Tank:
                 Pk += 4 * (x - y) + 10
                 y -= 1
             points += self.get_symetry_points(xc,yc,x,y)
-        # print(points)
         return points
     
-    def shoot(self, bullet_speed):
-        self.bullets.append((self.x, self.y, self.theta, bullet_speed))
+    def shoot(self, type_shoot):
+        if type_shoot == "normal":
+            self.bullets.append((self.x, self.y, self.theta, 20))
+        if type_shoot == "bigger" and len(self.big_bullet) == 0:
+            self.big_bullet.append((self.x, self.y, self.theta, 20))
 
     def update(self, delta_time: float):
         dtheta = self.angular_speed * delta_time
@@ -239,7 +243,7 @@ class Tank:
         self.x += dx
         self.y += dy
         
-        if (self.x > 0 and self.x < self.SCREEN_WIDTH) and (self.y > 0 and self.y < self.SCREEN_HEIGHT-150):
+        if (self.x > 0 and self.x < self.SCREEN_WIDTH) and (self.y > 0 and self.y < self.SCREEN_HEIGHT-100):
             self.body.translate(dx, dy)
             self.left_track.translate(dx, dy)
             self.right_track.translate(dx, dy)
@@ -267,6 +271,11 @@ class Tank:
             new_x = x + speed * math.cos(theta)
             new_y = y + speed * math.sin(theta)
             self.bullets[i] = (new_x, new_y, theta, speed)
+        
+        for _, (x, y, theta, speed) in enumerate(self.big_bullet):
+            new_x = x + speed * math.cos(theta)
+            new_y = y + speed * math.sin(theta)
+            self.big_bullet[0] = (new_x, new_y, theta, speed)
 
     def draw(self):
         if self.lifes>0:
@@ -278,13 +287,17 @@ class Tank:
             self.cannon.draw()
             self.shield.draw()
             
-            if (self.x > 0 and self.x < self.SCREEN_WIDTH) and (self.y > 0 and self.y < self.SCREEN_HEIGHT-150):
+            if (self.x > 0 and self.x < self.SCREEN_WIDTH) and (self.y > 0 and self.y < self.SCREEN_HEIGHT-100):
                 arcade.draw_point(self.x, self.y, arcade.color.RED, 4)
         for bx, by, theta, speed in self.bullets:
-            arcade.draw_point(bx, by, self.color, 7)
+            if (bx > 0 and by < self.SCREEN_WIDTH) and (by > 0 and by < self.SCREEN_HEIGHT-100):
+                arcade.draw_point(bx, by, self.color, 7)
+        for bx, by, theta, speed in self.big_bullet:
+            if (bx > 0 and by < self.SCREEN_WIDTH) and (by > 0 and by < self.SCREEN_HEIGHT-100):
+                arcade.draw_point(bx, by, self.color, 12)
 
 
-class Enemy:
+class HidePlace:
     def __init__(self, x, y, r):
         self.x = x
         self.y = y
@@ -295,6 +308,16 @@ class Enemy:
         for bullet in tank.bullets:
             if self.distance_to(bullet) <= self.r:
                 tank.bullets[index:index+1]=[]
+                break
+            index += 1
+
+        index = 0
+        for bigger in tank.big_bullet:
+            if self.distance_to(bigger) <= self.r:
+                tank.big_bullet[index:index+1]=[]
+                self.lifes -= 3
+                tank.big_bullet.append((0, 0, 0, 0))
+                tank.big_bullet.append((0, 0, 0, 0))
                 break
             index += 1
     
