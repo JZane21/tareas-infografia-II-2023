@@ -80,13 +80,15 @@ class Polygon2D:
 
 
 class Tank:
-    def __init__(self, x, y, color, numberTank) -> None:
+    def __init__(self, x, y, SCREEN_WIDTH, SCREEN_HEIGHT,color) -> None:
         self.color = color
         self.x = x
         self.y = y
         self.speed = 0
         self.angular_speed = 0
         self.theta = 0
+        self.SCREEN_WIDTH = SCREEN_WIDTH
+        self.SCREEN_HEIGHT = SCREEN_HEIGHT
         
         self.body_distance = 30
         self.body = Polygon2D([
@@ -201,6 +203,10 @@ class Tank:
     def shoot(self, bullet_speed):
         self.bullets.append((self.x, self.y, self.theta, bullet_speed))
 
+    def distance_to(self, bullet):
+        xb, yb, tb, sb = bullet
+        return math.sqrt((xb - self.x)**2 + (yb - self.y)**2)
+
     def update(self, delta_time: float):
         dtheta = self.angular_speed * delta_time
         dx = self.speed * math.cos(self.theta)
@@ -248,14 +254,13 @@ class Enemy:
         self.x = x
         self.y = y
         self.r = r
-        self.is_alive = True
     
     def detect_collision(self, tank: Tank):
         index = 0
         for bullet in tank.bullets:
             if self.distance_to(bullet) <= self.r:
-                self.is_alive = False
                 tank.bullets[index:index+1]=[]
+                break
             index += 1
     
     def distance_to(self, bullet):
@@ -263,5 +268,4 @@ class Enemy:
         return math.sqrt((xb - self.x)**2 + (yb - self.y)**2)
 
     def draw(self):
-        if self.is_alive:
-            arcade.draw_circle_filled(self.x, self.y, self.r, arcade.color.RED_DEVIL)
+        arcade.draw_circle_filled(self.x, self.y, self.r, arcade.color.RED_DEVIL)

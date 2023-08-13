@@ -5,7 +5,7 @@ from app_objects import Tank, Enemy, Polygon2D
 # definicion de constantes
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
-SCREEN_TITLE = "Tank"
+SCREEN_TITLE = "Tank Game"
 
 SPEED = 10
 
@@ -23,13 +23,13 @@ class App(arcade.Window):
         arcade.set_background_color(arcade.color.BLACK)
         self.rot_speed = 0.5
         self.speed = 10
-        self.tank = Tank(600, 600, get_random_color(),1)
-        self.tank2 = Tank(200, 200, get_random_color(),2)
+        self.tank = Tank(600, 600, SCREEN_WIDTH, SCREEN_HEIGHT,get_random_color())
+        self.tank2 = Tank(200, 200, SCREEN_WIDTH, SCREEN_HEIGHT,get_random_color())
         self.enemies = [
             Enemy(
                 random.randrange(0, SCREEN_WIDTH),
-                random.randrange(0, SCREEN_HEIGHT),
-                random.randrange(10, 50)
+                random.randrange(0, SCREEN_HEIGHT-150),
+                random.randrange(15, 60)
             )
             for _ in range(7)
         ]
@@ -102,17 +102,40 @@ class App(arcade.Window):
         
     def on_draw(self):
         arcade.start_render()
-        self.tank.draw()
-        limitGame = Polygon2D([
-            (1, 799),
-            (799, 799),
-            (799, 1),
-            (1, 1),
-        ],arcade.color.REDWOOD)
-        
+        limitGame = Polygon2D(
+            [
+                (2,698),
+                (798,698),
+                (798,2),
+                (2,2)
+            ],
+            arcade.color.REDWOOD
+        )
+        lifeZoneOne = Polygon2D(
+            [
+                (2,790),
+                (300,790),
+                (300,710),
+                (2,710),
+            ],
+            arcade.color.GREEN
+        )
+        lifeZoneTwo = Polygon2D(
+            [
+                (798,790),
+                (490,790),
+                (490,710),
+                (798,710),
+            ],
+            arcade.color.GREEN
+        )
+        lifeZoneOne.draw()
+        lifeZoneTwo.draw()
         limitGame.draw()
         
+        self.tank.draw()
         self.tank2.draw()
+        
         for e in self.enemies:
             e.draw()
     
