@@ -80,13 +80,46 @@ class Polygon2D:
 
 
 class Tank:
-    def __init__(self, x, y, color) -> None:
+    def __init__(self, x, y, color, numberTank) -> None:
+        self.color = color
         self.x = x
         self.y = y
         self.speed = 0
         self.angular_speed = 0
         self.theta = 0
-        self.body = Polygon2D([(100 + x, y), (x, 50 + y), (x, -50 + y)], color)
+        
+        self.body_distance = 30
+        self.body = Polygon2D([
+            (-self.body_distance + x, self.body_distance + y),
+            (self.body_distance + x, self.body_distance + y),
+            (self.body_distance + x, -self.body_distance + y),
+            (-self.body_distance + x, -self.body_distance + y),
+            (-self.body_distance + x, self.body_distance + y)
+        ] + [
+            (-self.body_distance + x + i, self.body_distance + y - j)
+            for i in range(0,60,1) for j in range(0,60,1)
+        ], color)
+        self.cannon = Polygon2D([
+            (30+x,10+y),
+            (90+x,10+y),
+            (90+x,-10+y),
+            (30+x,-10+y),
+            (90+x,-10+y),
+        ] + [
+            (30+ x + i,10 + y - j)
+            for i in range(0,60,1) for j in range(0,20,1)
+        ] + [
+            (90+x,-10+y),
+            (90+x,-20+y),
+            (110+x,-20+y),
+            (110+x,20+y),
+            (90+x,20+y),
+            (90+x,10+y)
+        ] + [
+            (90+x+i,20+y-j)
+            for i in range(0,20,1) for j in range(0,40,1)
+        ],color)
+        
         self.left_track = Polygon2D(
             [
                 (-40 + x, -30 + y), 
@@ -105,7 +138,65 @@ class Tank:
             ],
             color
         )
+        self.wheel_radious = 10
+        
+        self.wheels_positions = [
+            (-30+x,60+y),
+            (-10+x,60+y),
+            (10+x,60+y),
+            (30+x,60+y),
+            (50+x,60+y),
+            (-30+x,-60+y),
+            (-10+x,-60+y),
+            (10+x,-60+y),
+            (30+x,-60+y),
+            (50+x,-60+y),
+        ]
+        self.wheels = [
+            Polygon2D(
+                self.get_circle(i[0],i[1],self.wheel_radious),
+                color
+            ) for i in self.wheels_positions
+        ]
+        # [
+        #     [(-30+x,60+y),self.wheel_radious,color],
+        #     [(-10+x,60+y),self.wheel_radious,color],
+        #     [(10+x,60+y),self.wheel_radious,color],
+        #     [(30+x,60+y),self.wheel_radious,color],
+        #     [(50+x,60+y),self.wheel_radious,color]
+        # ]
+        self.life = 100
+        arcade.draw_circle_outline
         self.bullets = []
+        
+    def get_symetry_points(self,x0,y0,x1,y1):
+        return [
+            (x0+x1,y0+y1),
+            (x0+x1,y0-y1),
+            (x0-x1,y0+y1),
+            (x0-x1,y0-y1),
+            (x0+y1,y0+x1),
+            (x0+y1,y0-x1),
+            (x0-y1,y0+x1),
+            (x0-y1,y0-x1)
+        ]
+
+    def get_circle(self,xc, yc, r):
+        x = 0
+        y = r
+        Pk = 3 - 2 * r
+        points = []
+        points += self.get_symetry_points(xc,yc,x,y)
+        while x <= y:
+            x += 1
+            if Pk < 0:
+                Pk += (4 * x) + 6
+            else:
+                Pk += 4 * (x - y) + 10
+                y -= 1
+            points += self.get_symetry_points(xc,yc,x,y)
+        # print(points)
+        return points
     
     def shoot(self, bullet_speed):
         self.bullets.append((self.x, self.y, self.theta, bullet_speed))
@@ -117,13 +208,20 @@ class Tank:
         self.theta += dtheta
         self.x += dx
         self.y += dy
+        
         self.body.translate(dx, dy)
         self.left_track.translate(dx, dy)
         self.right_track.translate(dx, dy)
+        self.cannon.translate(dx,dy)
+        for i in self.wheels:
+            i.translate(dx,dy)
         
         self.body.rotate(dtheta, pivot=(self.x, self.y))
         self.left_track.rotate(dtheta, pivot=(self.x, self.y))
         self.right_track.rotate(dtheta, pivot=(self.x, self.y))
+        self.cannon.rotate(dtheta, pivot=(self.x, self.y))
+        for i in self.wheels:
+            i.rotate(dtheta, pivot=(self.x, self.y))
 
         self.update_bullets(delta_time)
 
@@ -137,10 +235,12 @@ class Tank:
         self.body.draw()
         self.left_track.draw()
         self.right_track.draw()
+        for i in self.wheels:
+            i.draw()
+        self.cannon.draw()
         arcade.draw_point(self.x, self.y, arcade.color.RED, 4)
-
         for bx, by, theta, speed in self.bullets:
-            arcade.draw_point(bx, by, arcade.color.YELLOW, 7)
+            arcade.draw_point(bx, by, self.color, 7)
 
 
 class Enemy:
@@ -151,9 +251,14 @@ class Enemy:
         self.is_alive = True
     
     def detect_collision(self, tank: Tank):
+        index = 0
         for bullet in tank.bullets:
             if self.distance_to(bullet) < self.r:
                 self.is_alive = False
+                tank.bullets[index:index+1]=[]
+                
+                break
+            index += 1
     
     def distance_to(self, bullet):
         xb, yb, tb, sb = bullet
