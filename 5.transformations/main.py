@@ -25,7 +25,7 @@ class BresenhamWindow(arcade.Window):
         self.draw_grid()
         # arcade.draw_polygon_outline(vertices, arcade.color.YELLOW, 5)
         new_vertices = self.scale(vertices, 2.5, 2.5)
-        self.update()
+        # self.update()
         arcade.draw_polygon_outline(new_vertices, arcade.color.CYBER_YELLOW, 5)
     
     def draw_grid(self):
