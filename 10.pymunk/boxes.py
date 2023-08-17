@@ -27,6 +27,25 @@ class BoxSprite(PhysicsSprite):
         self.width = width
         self.height = height
 
+class BoxSpriteList():
+    # self.sprite_list: arcade.SpriteList[PhysicsSprite] = arcade.SpriteList()
+    def __init__(self):
+        self.sprite_list: arcade.SpriteList[PhysicsSprite] = arcade.SpriteList()
+    
+    def push(self,element):
+        self.sprite_list.append(element)
+        
+    def on_update(self,space,delta_time: float):
+        space.step(1 / 60)
+        # for sprite in self.sprite_list:
+        for sprite in self.sprite_list:
+            sprite.center_x = sprite.pymunk_shape.body.position.x
+            sprite.center_y = sprite.pymunk_shape.body.position.y
+            sprite.angle = math.degrees(sprite.pymunk_shape.body.angle)
+            
+    def on_draw(self):
+        self.sprite_list.draw()
+
 
 class App(arcade.Window):
     def __init__(self, width, height, title):
@@ -39,7 +58,8 @@ class App(arcade.Window):
         self.space.gravity = (0.0, -900.0)
 
         # Lists of sprites or lines
-        self.sprite_list: arcade.SpriteList[PhysicsSprite] = arcade.SpriteList()
+        # self.sprite_list: arcade.SpriteList[PhysicsSprite] = arcade.SpriteList()
+        self.sprite_list = BoxSpriteList()
         self.static_lines = []
 
         # Used for dragging shapes around with the mouse
@@ -74,7 +94,7 @@ class App(arcade.Window):
                 # body.sleep()
 
                 sprite = BoxSprite(shape, ":resources:images/tiles/boxCrate_double.png", width=size, height=size)
-                self.sprite_list.append(sprite)
+                self.sprite_list.push(sprite)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         if button == arcade.MOUSE_BUTTON_LEFT:
@@ -90,18 +110,14 @@ class App(arcade.Window):
             self.space.add(body, shape)
 
             sprite = CircleSprite(shape, ":resources:images/items/coinGold.png")
-            self.sprite_list.append(sprite)
+            self.sprite_list.push(sprite)
 
     def on_update(self, delta_time: float):
-        self.space.step(1 / 60)
-        for sprite in self.sprite_list:
-            sprite.center_x = sprite.pymunk_shape.body.position.x
-            sprite.center_y = sprite.pymunk_shape.body.position.y
-            sprite.angle = math.degrees(sprite.pymunk_shape.body.angle)
+        self.sprite_list.on_update(self.space, delta_time)
 
     def on_draw(self):
         arcade.start_render()
-        self.sprite_list.draw()
+        self.sprite_list.on_draw()
 
 
 if __name__ == "__main__":
