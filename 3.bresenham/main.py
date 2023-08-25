@@ -1,12 +1,12 @@
 import arcade
-from bresenham import get_line
+from mod_bresenham import get_line
+from alg_dda import algoritmo_dda
 
 # definicion de constantes
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
-SCREEN_TITLE = "Lineas con bresenham"
-
-
+# SCREEN_TITLE = "Lineas con bresenham"
+SCREEN_TITLE = "Lineas con DDA"
 
 class BresenhamWindow(arcade.Window):
     def __init__(self):
@@ -16,11 +16,10 @@ class BresenhamWindow(arcade.Window):
 
     def on_draw(self):
         arcade.start_render()
-
-        points = get_line(5, 5, 30, 15)
+        points = get_line(5,7,10,3)
         self.draw_grid()
         self.draw_line_points(points, arcade.color.DARK_YELLOW)
-        self.draw_scaled_line(30, 15, 5, 5)
+        self.draw_scaled_line(5,7,10,3)
 
     def draw_grid(self):
         # lineas verticales
@@ -56,6 +55,16 @@ class BresenhamWindow(arcade.Window):
             5
         )
 
+'''
+correo: eduardolaruta+tareas@gmail.com
+Infografia_1_carrasco
+Infografia_2_carrasco
+
+Tarea 1:
+debe ser un archivo.zip, donde debe tener el archivo estudiantes.py
+Tarea 2:
+// bresenham.py
+'''
 
 if __name__ == "__main__":
     app = BresenhamWindow()

@@ -63,42 +63,43 @@ class App(arcade.Window):
         self.world.append(pig1)
 
     def on_update(self, delta_time: float):
-        self.space.step(1 / 60.0)   # actualiza la simulacion de las fisicas
-        self.update_collisions()
+        self.space.step(1 / 60)
         self.sprites.update()
+        for sprite in self.sprites:
+            sprite.update()
 
     def update_collisions(self):
         pass
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
-            # print("clic")
-            self.start_point = (x, y)
-            self.end_point = (x, y)
-            self.draw_line = True
-            
+            self.start_point = (x,y)
+            self.end_point = (x,y)
+            print(f"START: ( {self.start_point[0]} , {self.start_point[1]} )")
+
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
         if buttons == arcade.MOUSE_BUTTON_LEFT:
-            # print("drag")
-            self.end_point = (x, y)
+            self.end_point = (x,y)
+            self.draw_line = True
+            print(f"END: ( {self.end_point[0]} , {self.end_point[1]} )")
+
+    def calcular_angulo(self,x1:int,y1:int,x2:int,y2:int):
+        return math.atan((y2-y1)/(x2-x1))
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
         if button == arcade.MOUSE_BUTTON_LEFT:
-            # print("release")
+            print("release")
+            X1 = self.start_point[0]
+            Y1 = self.start_point[1]
+            X2 = self.end_point[0]
+            Y2 = self.end_point[1]
             self.draw_line = False
-            angle = -arcade.get_angle_radians(
-                self.start_point[0],
-                self.start_point[1],
-                self.end_point[0],
-                self.end_point[1],
-            ) - math.pi / 90
-            self.distance = arcade.get_distance(
-                self.start_point[0],
-                self.start_point[1],
-                self.end_point[0],
-                self.end_point[1],
+            angulo = self.calcular_angulo(
+                X1 , Y1,
+                X2 , Y2
             )
-            bird = Bird("11.angry/assets/img/red-bird3.png", self.distance, angle, x, y, self.space)
+            bird = Bird("11.angry/assets/img/red-bird3.png", math.sqrt((X2-X1)**2 + (Y2-Y1)**2), angulo,
+                        X1, Y1, self.space)
             self.sprites.append(bird)
             self.birds.append(bird)
 
@@ -106,7 +107,7 @@ class App(arcade.Window):
         arcade.start_render()
         self.sprites.draw()
         if self.draw_line:
-            arcade.draw_line(self.start_point[0], self.start_point[1], self.end_point[0], self.end_point[1], arcade.color.BLACK, 3)
+            arcade.draw_line(self.start_point[0], self.start_point[1], self.end_point[0], self.end_point[1], arcade.color.BROWN, 5)
 
 
 def main():

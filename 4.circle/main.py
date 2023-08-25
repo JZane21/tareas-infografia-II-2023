@@ -1,5 +1,5 @@
 import arcade
-from circle import get_circle
+from circle2 import get_circle
 
 # definicion de constantes
 SCREEN_WIDTH = 800
@@ -16,23 +16,21 @@ class BresenhamWindow(arcade.Window):
         self.yc = 20
         self.r = 20
         self.circle_color = arcade.color.RED_DEVIL
-
-        self.speed = 25
-        self.velocity = [self.speed, self.speed]
+        self.rebote_x = False
+        self.speed = 30
 
     def on_update(self, delta_time: float):
-        self.xc += delta_time * self.velocity[0]
-        self.yc += delta_time * self.velocity[1]
-
-        # Logica del rebote en X
-        if (self.xc + self.r > SCREEN_WIDTH // self.pixel_size 
-            or self.xc - self.r < 0):
-            self.velocity[0] = -1 * self.velocity[0]
-
-        # Logica del rebote en Y
-        if (self.yc + self.r > SCREEN_HEIGHT // self.pixel_size 
-            or self.yc - self.r < 0):
-            self.velocity[1] = -1 * self.velocity[1]
+        velocity = delta_time * self.speed
+        if self.xc-self.r <=0 and self.rebote_x:
+            self.rebote_x = False
+            self.xc += velocity
+        if (self.xc+self.r < (SCREEN_WIDTH  // self.pixel_size) and not self.rebote_x):
+            self.xc += velocity
+        elif (self.xc+self.r) >= (SCREEN_WIDTH  // self.pixel_size):
+            self.rebote_x = True
+            self.xc -= velocity
+        elif (self.xc+self.r < (SCREEN_WIDTH  // self.pixel_size) and self.rebote_x):
+            self.xc -= velocity
 
     def on_draw(self):
         arcade.start_render()
