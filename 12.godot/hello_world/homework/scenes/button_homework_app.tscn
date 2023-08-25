@@ -1,0 +1,73 @@
+[gd_scene load_steps=5 format=3 uid="uid://bd35gmghqcrlf"]
+
+[ext_resource type="Texture2D" uid="uid://dtjvjy6iqo34n" path="res://icon.svg" id="1_ux3r0"]
+[ext_resource type="Script" path="res://homework/scripts/ObjetoControlado.gd" id="2_uuop7"]
+[ext_resource type="Texture2D" uid="uid://c0pf8ixw8cvau" path="res://left-rotation.png" id="3_u0mde"]
+[ext_resource type="Texture2D" uid="uid://cph3v1c88h3ma" path="res://right-rotation.png" id="4_wbatn"]
+
+[node name="ButtonHomeworkApp" type="Node2D"]
+
+[node name="ObjetoControlado" type="Sprite2D" parent="."]
+position = Vector2(771, 229)
+scale = Vector2(0.654297, 0.632813)
+texture = ExtResource("1_ux3r0")
+script = ExtResource("2_uuop7")
+
+[node name="LeftButton" type="Button" parent="."]
+offset_left = 65.0
+offset_top = 539.0
+offset_right = 123.0
+offset_bottom = 594.0
+
+[node name="RightButton" type="Button" parent="."]
+offset_left = 195.0
+offset_top = 539.0
+offset_right = 254.0
+offset_bottom = 596.0
+
+[node name="DownButton" type="Button" parent="."]
+offset_left = 127.0
+offset_top = 539.0
+offset_right = 190.0
+offset_bottom = 595.0
+
+[node name="UpButton" type="Button" parent="."]
+offset_left = 127.0
+offset_top = 474.0
+offset_right = 189.0
+offset_bottom = 534.0
+
+[node name="LeftRotationButton" type="Button" parent="."]
+offset_left = 34.0
+offset_top = 454.0
+offset_right = 91.0
+offset_bottom = 509.0
+
+[node name="Sprite2D" type="Sprite2D" parent="LeftRotationButton"]
+position = Vector2(29, 27)
+scale = Vector2(0.217795, 0.218182)
+texture = ExtResource("3_u0mde")
+
+[node name="RightRotationButton" type="Button" parent="."]
+offset_left = 234.0
+offset_top = 453.0
+offset_right = 290.0
+offset_bottom = 509.0
+
+[node name="Sprite2D" type="Sprite2D" parent="RightRotationButton"]
+position = Vector2(28, 29)
+scale = Vector2(0.211667, 0.201667)
+texture = ExtResource("4_wbatn")
+
+[connection signal="button_down" from="LeftButton" to="ObjetoControlado" method="_on_left_button_button_down"]
+[connection signal="button_up" from="LeftButton" to="ObjetoControlado" method="_on_left_button_button_up"]
+[connection signal="button_down" from="RightButton" to="ObjetoControlado" method="_on_right_button_button_down"]
+[connection signal="button_up" from="RightButton" to="ObjetoControlado" method="_on_right_button_button_up"]
+[connection signal="button_down" from="DownButton" to="ObjetoControlado" method="_on_down_button_button_down"]
+[connection signal="button_up" from="DownButton" to="ObjetoControlado" method="_on_down_button_button_up"]
+[connection signal="button_down" from="UpButton" to="ObjetoControlado" method="_on_up_button_button_down"]
+[connection signal="button_up" from="UpButton" to="ObjetoControlado" method="_on_up_button_button_up"]
+[connection signal="button_down" from="LeftRotationButton" to="ObjetoControlado" method="_on_left_rotation_button_button_down"]
+[connection signal="button_up" from="LeftRotationButton" to="ObjetoControlado" method="_on_left_rotation_button_button_up"]
+[connection signal="button_down" from="RightRotationButton" to="ObjetoControlado" method="_on_right_rotation_button_button_down"]
+[connection signal="button_up" from="RightRotationButton" to="ObjetoControlado" method="_on_right_rotation_button_button_up"]

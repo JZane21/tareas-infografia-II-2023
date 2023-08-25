@@ -1,0 +1,46 @@
+[gd_scene load_steps=7 format=3 uid="uid://bikxhroma2p5d"]
+
+[ext_resource type="Script" path="res://scripts/ButtonApp.gd" id="1_nnx8r"]
+[ext_resource type="Texture2D" uid="uid://dvu54xxrgpctc" path="res://icon.svg" id="2_jyrra"]
+[ext_resource type="Script" path="res://scripts/UpButton.gd" id="3_lq623"]
+[ext_resource type="Script" path="res://scripts/RightButton.gd" id="4_haubw"]
+[ext_resource type="Script" path="res://scripts/LeftButton.gd" id="5_64kjh"]
+[ext_resource type="Script" path="res://scripts/DownButton.gd" id="6_trr5g"]
+
+[node name="ButtonApp" type="Node2D"]
+script = ExtResource("1_nnx8r")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(124, 76)
+scale = Vector2(0.539063, 0.484375)
+texture = ExtResource("2_jyrra")
+
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="Button4" type="Button" parent="Node2D"]
+offset_left = 95.0
+offset_top = 185.0
+offset_right = 158.0
+offset_bottom = 238.0
+script = ExtResource("3_lq623")
+
+[node name="Button2" type="Button" parent="Node2D"]
+offset_left = 174.0
+offset_top = 214.0
+offset_right = 237.0
+offset_bottom = 267.0
+script = ExtResource("4_haubw")
+
+[node name="Button" type="Button" parent="Node2D"]
+offset_left = 17.0
+offset_top = 215.0
+offset_right = 80.0
+offset_bottom = 268.0
+script = ExtResource("5_64kjh")
+
+[node name="Button3" type="Button" parent="Node2D"]
+offset_left = 95.0
+offset_top = 251.0
+offset_right = 158.0
+offset_bottom = 304.0
+script = ExtResource("6_trr5g")
